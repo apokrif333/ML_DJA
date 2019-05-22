@@ -76,13 +76,24 @@ def create_vol(df: pd.DataFrame):
     tl.save_csv(PATH_TO_SAVE, 'DJI Features_3', df)
 
 
-def mom_and_sma_one_hot_encoding(df: pd.DataFrame):
+def mom_sma_vol_one_hot_encoding(df: pd.DataFrame):
     for i in range(1, 25):
         df[f"Momentum_bool_{i}"] = np.array(df[f"Momentum_perc_{i}"] >= 0).astype('int')
 
     sma_columns = [10, 20] + list(range(25, 425, 25))
     for number in sma_columns:
         df[f"SMA_bool_{number}"] = np.array(df[f"SMA_perc_{number}"] >= 0).astype('int')
+
+    vol_list = list(range(3, 32, 2))
+    for i in range(len(vol_list)):
+        if i == 0:
+            df[f"Vol_bool_{vol_list[i]}"] = np.array(df['Annual_vol_perc_1'] < vol_list[i]).astype('int')
+        elif i + 1 != len(vol_list):
+            check_vols = np.array(vol_list[i] <= df['Annual_vol_perc_1']) == \
+                         np.array(df['Annual_vol_perc_1'] < vol_list[i + 1])
+            df[f"Vol_bool_{vol_list[i]}_{vol_list[i + 1]}"] = check_vols.astype('int')
+        else:
+            df[f"Vol_bool_{vol_list[i]}"] = np.array(vol_list[i] <= df['Annual_vol_perc_1']).astype('int')
 
     tl.save_csv(PATH_TO_SAVE, 'DJI Features_4', df)
 
@@ -127,7 +138,8 @@ def check_data_wholeness(df: pd.DataFrame):
 
 if __name__ == "__main__":
     # !We have saturdays from start to 1952 year!
-    # !We have empty data from 7/30/1914 to 12/12/1914!
+    # !We have empty data from 7/30/1914 to 12/12/1914! Для цельности обучения лучше вырезать период (12/12/1914 + 2 года)
 
-    df = pd.read_csv('database/DJI Features_6.csv', converters={'Date': pd.to_datetime})
-    check_data_wholeness(df)
+    # 1) Добавить недельную волу. 2) Энкодинг волы завязать не на месяц, а на какой-нибудь период недель.
+
+    df = pd.read_csv('database/DJI Features_7.csv', converters={'Date': pd.to_datetime})
