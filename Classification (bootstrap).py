@@ -7,12 +7,14 @@ from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
 
 from libs import trading_lib as tl
+from datetime import datetime
 
 import pandas as pd; # pd.options.display.max_rows = 40_000; pd.set_option('display.max_columns', 40_000)
 import numpy as np
 
 """ Мысли
 1) На лесе были опробованы тестовые сайзы [.1, .2, .3, .4], при 4-ёх разных рандом-стейтах. Среднее аккураси >0.75. Всё с бутстрепом.
+2) Соседи дали >.90, при использовании более 10 фичей. На разных тестовых сайзах и 91% на основном бутстреп-тестовом файле. 
 
 
 """
@@ -46,9 +48,7 @@ def kNN():
     print(accuracy_score(y, y_predict))
 
 
-X_df = pd.read_csv('teach_data/X_train.csv', converters={'Date': pd.to_datetime})
-# y_train = pd.read_csv('teach_data/y_train.csv', converters={'Date': pd.to_datetime})
-
+X_df = pd.read_csv('database/DJI Features_8.csv', converters={'Date': pd.to_datetime})
 y = X_df['y_month']
 X_df.drop(axis=1, columns=['y_month', 'Close'], inplace=True)
 
