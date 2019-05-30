@@ -84,8 +84,9 @@ X_train.drop(axis=1, columns=['Date', 'y_month', 'Close'], inplace=True)
 features_names = X_train.columns
 np_X_train = features_pipeline(X_train)
 
-print(features_names[57:80])
-np_X_train = np_X_train[:, 57:80]
+# Булы от 80 до 113
+print(features_names[99:113])
+np_X_train = np_X_train
 
 kNN()
 # input()
