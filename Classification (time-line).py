@@ -7,7 +7,7 @@ import xgboost as xgb
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score, ShuffleSplit, StratifiedKFold, TimeSeriesSplit
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 
 from libs import trading_lib as tl
 from datetime import datetime
@@ -43,14 +43,16 @@ def kNN():
     # feature_map_nystroem = Nystroem(gamma=.2, random_state=17, n_components=162)
     # data_transform = feature_map_nystroem.fit_transform(X_train)
 
-    model = LogisticRegression(C=0.0001, n_jobs=-1, random_state=17)
+    model = RandomForestClassifier(n_estimators=1_000, max_depth=4, n_jobs=-1)
     ss = TimeSeriesSplit(n_splits=5)
     for train_index, test_index in ss.split(np_X_train):
         model.fit(np_X_train[train_index], y_train[train_index])
         y_predict = model.predict(np_X_train[test_index])
 
-        print(len(y_train[test_index][y_train[test_index]==1]) / len(y_train[test_index][y_train[test_index]==0]))
+        print(1 -
+              (1 / (len(y_train[test_index][y_train[test_index]==1]) / len(y_train[test_index][y_train[test_index]==0]) + 1)))
         print(accuracy_score(y_train[test_index], y_predict))
+        print(classification_report(y_train[test_index], y_predict, target_names=['Short', 'Long']))
 
         # new_frame = pd.DataFrame({'Date': date[test_index], 'Predict': y_predict})
         # print(new_frame.loc[new_frame['Predict'] < 0.35])
